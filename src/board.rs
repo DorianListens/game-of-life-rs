@@ -2,13 +2,13 @@ pub trait Board: Clone {
     fn at(&self, coordiates: Coordinates) -> Option<&Cell>;
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Cell {
     pub cell_state: CellState,
     pub location: Coordinates,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum CellState {
     Alive,
     Dead,
