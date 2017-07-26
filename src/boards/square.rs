@@ -1,42 +1,5 @@
 use std::collections::HashMap;
-
-pub trait Board: Clone {
-    fn at(&self, coordiates: Coordinates) -> Option<&Cell>;
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
-pub struct Cell {
-    pub cell_state: CellState,
-    pub location: Coordinates,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
-pub enum CellState {
-    Alive,
-    Dead,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
-pub struct Coordinates {
-    pub x: i32,
-    pub y: i32,
-}
-
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct EmptyBoard {}
-
-impl EmptyBoard {
-    pub fn new() -> EmptyBoard {
-        EmptyBoard {}
-    }
-}
-
-impl Board for EmptyBoard {
-    fn at(&self, coordinates: Coordinates) -> Option<&Cell> {
-        None
-    }
-}
+use board::{Board, Cell, CellState, Coordinates};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SquareBoard {
@@ -82,7 +45,7 @@ impl Board for SquareBoard {
 
 #[cfg(test)]
 mod tests {
-    use board::*;
+    use boards::square::*;
 
     #[test]
     fn a_square_board_all_alive() {
