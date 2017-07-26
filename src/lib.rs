@@ -7,8 +7,9 @@
 
 mod board;
 mod boards;
+mod generator;
 mod life {
-    use board::Board;
+    use board::{Board, Generator, Renderer};
 
     pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
         board: T,
@@ -36,14 +37,6 @@ mod life {
 
             b
         }
-    }
-
-    pub trait Renderer<T: Board> {
-        fn render(&self, board: &T);
-    }
-
-    pub trait Generator<T: Board> {
-        fn generate(&self, board: &T) -> T;
     }
 }
 
@@ -109,7 +102,7 @@ mod tests {
 
     #[derive(Debug, PartialEq, Eq, Clone, Hash)]
     struct FakeBoard {
-        seed: i32
+        seed: i32,
     }
 
     impl FakeBoard {

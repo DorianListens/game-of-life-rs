@@ -3,8 +3,8 @@ use board::{Board, Cell, CellState, Coordinates};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SquareBoard {
-    cells: HashMap<Coordinates, Cell>,
-    size: i32,
+    pub cells: HashMap<Coordinates, Cell>,
+    pub size: i32,
 }
 
 impl SquareBoard {
