@@ -9,29 +9,40 @@ mod board;
 mod life {
     use board::Board;
 
-    pub struct Game<'a, T: Board, U: 'a + Renderer<T>> {
+    pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
         board: T,
         renderer: &'a U,
+        generator: &'a V,
     }
 
-    impl<'a, T: Board, U: Renderer<T>> Game<'a, T, U> {
-        pub fn new(board: T, renderer: &'a U) -> Game<'a, T, U> {
-            Game { board, renderer }
+    impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
+        pub fn new(board: T, renderer: &'a U, generator: &'a V) -> Game<'a, T, U, V> {
+            Game {
+                board,
+                renderer,
+                generator,
+            }
         }
 
         pub fn play(self, generations: u32) -> T {
             self.renderer.render(&self.board);
 
+            let mut b = self.board;
             for i in 0..generations {
-                self.renderer.render(&self.board);
+                b = self.generator.generate(&b);
+                self.renderer.render(&b);
             }
 
-            self.board
+            b
         }
     }
 
     pub trait Renderer<T: Board> {
         fn render(&self, board: &T);
+    }
+
+    pub trait Generator<T: Board> {
+        fn generate(&self, board: &T) -> T;
     }
 }
 
@@ -39,20 +50,24 @@ mod life {
 mod tests {
     use life::*;
     use board::*;
+
     #[test]
     fn zero_generations_returns_the_original_board() {
+        let generator = FakeGenerator::new();
         let renderer = FakeRenderer::new();
-        let seed_board = EmptyBoard::new();
-        let game = Game::new(seed_board.clone(), &renderer);
+        let seed_board = FakeBoard::new(0);
+        let game = Game::new(seed_board.clone(), &renderer, &generator);
         let result_board = game.play(0);
+
         assert_eq!(seed_board, result_board);
     }
 
     #[test]
     fn the_game_renders_the_board() {
+        let generator = FakeGenerator::new();
         let renderer = FakeRenderer::new();
-        let board = EmptyBoard::new();
-        let game = Game::new(board.clone(), &renderer);
+        let board = FakeBoard::new(0);
+        let game = Game::new(board.clone(), &renderer, &generator);
         let _ = game.play(0);
 
         assert_eq!(renderer.boards.borrow().first(), Some(&board));
@@ -60,12 +75,71 @@ mod tests {
 
     #[test]
     fn the_game_renders_the_board_for_each_generation() {
+        let generator = FakeGenerator::new();
         let renderer = FakeRenderer::new();
-        let board = EmptyBoard::new();
-        let game = Game::new(board.clone(), &renderer);
+        let board = FakeBoard::new(0);
+        let game = Game::new(board.clone(), &renderer, &generator);
         let _ = game.play(500);
 
         assert_eq!(renderer.boards.borrow().len(), 501);
+    }
+
+    #[test]
+    fn the_game_passes_the_board_to_the_generator() {
+        let generator = FakeGenerator::new();
+        let renderer = FakeRenderer::new();
+        let board = FakeBoard::new(0);
+        let game = Game::new(board.clone(), &renderer, &generator);
+        let _ = game.play(1);
+
+        assert_eq!(generator.boards.borrow().first(), Some(&board));
+    }
+
+    #[test]
+    fn the_generator_creates_new_boards() {
+        let generator = FakeGenerator::new();
+        let renderer = FakeRenderer::new();
+        let board = FakeBoard::new(0);
+        let game = Game::new(board.clone(), &renderer, &generator);
+        let result = game.play(1);
+
+        assert_eq!(result, FakeBoard::new(1337));
+    }
+
+    #[derive(Debug, PartialEq, Eq, Clone, Hash)]
+    struct FakeBoard {
+        seed: i32
+    }
+
+    impl FakeBoard {
+        fn new(seed: i32) -> FakeBoard {
+            FakeBoard { seed }
+        }
+    }
+
+    impl Board for FakeBoard {
+        fn at(&self, coordinates: Coordinates) -> Option<&Cell> {
+            None
+        }
+    }
+
+    struct FakeGenerator<T: Board> {
+        boards: RefCell<Vec<T>>,
+    }
+
+    impl<T: Board> FakeGenerator<T> {
+        fn new() -> FakeGenerator<T> {
+            FakeGenerator {
+                boards: RefCell::new(Vec::new()),
+            }
+        }
+    }
+
+    impl Generator<FakeBoard> for FakeGenerator<FakeBoard> {
+        fn generate(&self, board: &FakeBoard) -> FakeBoard {
+            self.boards.borrow_mut().push(board.clone());
+            FakeBoard::new(1337)
+        }
     }
 
     use std::cell::RefCell;
