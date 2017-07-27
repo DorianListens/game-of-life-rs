@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use board::{Board, Cell, CellState, Coordinates};
+use interface::Board;
+use models::*;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SquareBoard {
-    pub cells: HashMap<Coordinates, Cell>,
+    pub cells: Vec<Cell>,
     pub size: i32,
 }
 
@@ -11,12 +11,12 @@ impl SquareBoard {
     pub fn new(size: i32) -> SquareBoard {
         SquareBoard {
             size: size,
-            cells: HashMap::new(),
+            cells: Vec::new(),
         }
     }
 
     pub fn all_alive(size: i32) -> SquareBoard {
-        let mut map = HashMap::new();
+        let mut vec = Vec::new();
 
         for x in 0..size {
             for y in 0..size {
@@ -26,26 +26,26 @@ impl SquareBoard {
                     cell_state: state,
                     location: location,
                 };
-                map.insert(location, cell);
+                vec.push(cell);
             }
         }
 
         SquareBoard {
             size: size,
-            cells: map,
+            cells: vec,
         }
     }
 }
 
 impl Board for SquareBoard {
     fn at(&self, coordinates: Coordinates) -> Option<&Cell> {
-        self.cells.get(&coordinates)
+        self.cells.iter().find(|x| x.location == coordinates)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use boards::square::*;
+    use super::*;
 
     #[test]
     fn a_square_board_all_alive() {

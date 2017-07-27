@@ -5,45 +5,45 @@
 // Any live cell with more than three live neighbours dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
+mod models;
+mod interface;
 mod board;
-mod boards;
 mod generator;
-mod life {
-    use board::{Board, Generator, Renderer};
+use interface::{Board, Generator, Renderer};
 
-    pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
-        board: T,
-        renderer: &'a U,
-        generator: &'a V,
+pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
+    board: T,
+    renderer: &'a U,
+    generator: &'a V,
+}
+
+impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
+    pub fn new(board: T, renderer: &'a U, generator: &'a V) -> Game<'a, T, U, V> {
+        Game {
+            board,
+            renderer,
+            generator,
+        }
     }
 
-    impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
-        pub fn new(board: T, renderer: &'a U, generator: &'a V) -> Game<'a, T, U, V> {
-            Game {
-                board,
-                renderer,
-                generator,
-            }
+    pub fn play(self, generations: u32) -> T {
+        self.renderer.render(&self.board);
+
+        let mut b = self.board;
+        for i in 0..generations {
+            b = self.generator.generate(&b);
+            self.renderer.render(&b);
         }
 
-        pub fn play(self, generations: u32) -> T {
-            self.renderer.render(&self.board);
-
-            let mut b = self.board;
-            for i in 0..generations {
-                b = self.generator.generate(&b);
-                self.renderer.render(&b);
-            }
-
-            b
-        }
+        b
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use life::*;
-    use board::*;
+    use super::*;
+    use interface::*;
+    use models::*;
 
     #[test]
     fn zero_generations_returns_the_original_board() {
