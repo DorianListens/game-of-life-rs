@@ -1,4 +1,4 @@
-use models::{Cell, Coordinates};
+pub use models::{Cell, Coordinates};
 
 pub trait Board: Clone {
     fn at(&self, coordiates: Coordinates) -> Option<&Cell>;

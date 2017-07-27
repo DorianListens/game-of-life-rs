@@ -30,7 +30,7 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
         self.renderer.render(&self.board);
 
         let mut b = self.board;
-        for i in 0..generations {
+        for _ in 0..generations {
             b = self.generator.generate(&b);
             self.renderer.render(&b);
         }
@@ -43,7 +43,6 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
 mod tests {
     use super::*;
     use interface::*;
-    use models::*;
 
     #[test]
     fn zero_generations_returns_the_original_board() {

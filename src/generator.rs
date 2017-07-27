@@ -1,6 +1,5 @@
 use board::square::SquareBoard;
 use interface::{Board, Generator};
-use models::*;
 use engine::*;
 
 struct SquareGenerator {}

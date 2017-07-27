@@ -58,13 +58,6 @@ pub struct Cell {
     pub location: Coordinates,
 }
 
-pub fn state(cell: Option<&Cell>) -> Option<CellState> {
-    match cell {
-        None => None,
-        Some(x) => Some(x.cell_state),
-    }
-}
-
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum CellState {
     Alive,
