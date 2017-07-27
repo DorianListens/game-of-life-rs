@@ -15,6 +15,13 @@ impl SquareBoard {
         }
     }
 
+    pub fn with_cells(cells: Vec<Cell>) -> SquareBoard {
+        SquareBoard {
+            size: 0,
+            cells,
+        }
+    }
+
     pub fn all_alive(size: i32) -> SquareBoard {
         let mut vec = Vec::new();
 
