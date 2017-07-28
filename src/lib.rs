@@ -9,6 +9,7 @@ mod engine;
 mod interface;
 mod board;
 mod generator;
+mod renderer;
 use interface::{Board, Generator, Renderer};
 
 pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
