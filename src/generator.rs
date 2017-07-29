@@ -2,7 +2,7 @@ use board::square::SquareBoard;
 use interface::{Board, Generator};
 use engine::*;
 
-struct SquareGenerator {}
+pub struct SquareGenerator {}
 
 impl Generator<SquareBoard> for SquareGenerator {
     fn generate(&self, board: &SquareBoard) -> SquareBoard {

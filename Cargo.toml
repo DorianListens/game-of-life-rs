@@ -4,3 +4,8 @@ version = "0.1.0"
 authors = ["Dorian Scheidt <dorian.scheidt@gmail.com>"]
 
 [dependencies]
+rand = "0.3"
+
+[[bin]]
+name = "game"
+path = "src/main.rs"

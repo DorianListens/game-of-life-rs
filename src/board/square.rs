@@ -1,6 +1,9 @@
 use interface::Board;
 use models::*;
 
+extern crate rand;
+use rand::*;
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SquareBoard {
     pub cells: Vec<Cell>,
@@ -29,6 +32,32 @@ impl SquareBoard {
             for y in 0..size {
                 let location = Coordinates { x, y };
                 let state = CellState::Alive;
+                let cell = Cell {
+                    cell_state: state,
+                    location: location,
+                };
+                vec.push(cell);
+            }
+        }
+
+        SquareBoard {
+            size: size,
+            cells: vec,
+        }
+    }
+
+    pub fn random(size: i32) -> SquareBoard {
+        let mut rng = rand::thread_rng();
+        let mut vec = Vec::new();
+
+        for x in 0..size {
+            for y in 0..size {
+                let location = Coordinates { x, y };
+                let state = if rng.gen() {
+                    CellState::Alive
+                } else {
+                    CellState::Dead
+                };
                 let cell = Cell {
                     cell_state: state,
                     location: location,

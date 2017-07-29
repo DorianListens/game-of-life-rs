@@ -4,13 +4,15 @@
 // Any live cell with more than three live neighbours dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-mod models;
+extern crate rand;
+pub mod models;
 mod engine;
-mod interface;
-mod board;
-mod generator;
-mod renderer;
+pub mod interface;
+pub mod board;
+pub mod generator;
+pub mod renderer;
 use interface::{Board, Generator, Renderer};
+use std::{thread, time};
 
 pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
     board: T,
@@ -27,13 +29,14 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
         }
     }
 
-    pub fn play(self, generations: u32) -> T {
+    pub fn play(self, generations: u32, delay: time::Duration) -> T {
         self.renderer.render(&self.board);
 
         let mut b = self.board;
         for _ in 0..generations {
             b = self.generator.generate(&b);
             self.renderer.render(&b);
+            thread::sleep(delay);
         }
 
         b
