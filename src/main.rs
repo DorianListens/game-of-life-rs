@@ -1,15 +1,19 @@
+extern crate termion;
 extern crate life;
 use life::models::*;
 use life::renderer::ScreenRenderer;
 use life::board::square::*;
 use life::interface::*;
 use life::generator::*;
+use std::io::stdout;
 
 use std::{thread, time};
 
 fn main() {
-    let renderer = ScreenRenderer::new(50);
-    let board = SquareBoard::random(50);
+    let size = termion::terminal_size().expect("Couldn't get terminal size");
+
+    let renderer = ScreenRenderer::new(stdout(), size.1, size.0);
+    let board = GridBoard::random(size.1.into(), size.0.into());
     let generator = SquareGenerator {};
 
     let game = life::Game::new(board, &renderer, &generator);

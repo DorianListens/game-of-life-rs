@@ -5,6 +5,7 @@
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 extern crate rand;
+extern crate termion;
 pub mod models;
 mod engine;
 pub mod interface;

@@ -1,9 +1,14 @@
 use models::*;
 use interface::{Board, Renderer};
 use board::square::*;
+use termion::clear;
+use termion::raw::IntoRawMode;
+use std::io::{Write, Stdout, stdout};
 
 pub struct ScreenRenderer {
-    size: i32,
+    stdout: Stdout,
+    width: u16,
+    height: u16,
 }
 
 impl<T: Board> Renderer<T> for ScreenRenderer {
@@ -15,16 +20,16 @@ impl<T: Board> Renderer<T> for ScreenRenderer {
 }
 
 impl ScreenRenderer {
-    pub fn new(size: i32) -> ScreenRenderer {
-        ScreenRenderer { size }
+    pub fn new(stdout: Stdout, width: u16, height: u16) -> ScreenRenderer {
+        ScreenRenderer { stdout, width, height }
     }
 
     fn rows<T: Board>(&self, board: &T) -> Vec<Vec<Option<Cell>>> {
         let mut rows = Vec::new();
-        for x in 0..self.size {
+        for x in 0..self.width {
             let mut row = Vec::new();
-            for y in 0..self.size {
-                row.push(board.at(Coordinates { x, y }));
+            for y in 0..self.height {
+                row.push(board.at(Coordinates { x: x.into(), y: y.into() }));
             }
             rows.push(row);
         }

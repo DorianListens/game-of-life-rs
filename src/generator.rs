@@ -1,11 +1,11 @@
-use board::square::SquareBoard;
+use board::square::GridBoard;
 use interface::{Board, Generator};
 use engine::*;
 
 pub struct SquareGenerator {}
 
-impl Generator<SquareBoard> for SquareGenerator {
-    fn generate(&self, board: &SquareBoard) -> SquareBoard {
+impl Generator<GridBoard> for SquareGenerator {
+    fn generate(&self, board: &GridBoard) -> GridBoard {
         let neighbour_states = board.cells.iter().map(|x| x.location.neighbours()).map(
             |x| {
                 x.into_iter()
@@ -22,6 +22,6 @@ impl Generator<SquareBoard> for SquareGenerator {
             .map(|(cell, neighbours)| process(cell, neighbours))
             .collect();
 
-        SquareBoard::with_cells(new_cells)
+        GridBoard::with_cells(new_cells)
     }
 }
