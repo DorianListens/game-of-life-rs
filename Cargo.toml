@@ -11,3 +11,6 @@ rayon = "0.8.2"
 [[bin]]
 name = "game"
 path = "src/main.rs"
+
+[profile.release]
+debug = true

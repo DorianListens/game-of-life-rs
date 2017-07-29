@@ -10,7 +10,7 @@ use std::io::stdout;
 use std::{thread, time};
 
 fn main() {
-    let size = termion::terminal_size().expect("Couldn't get terminal size");
+    let size = termion::terminal_size().unwrap_or((50, 50));
 
     let renderer = ScreenRenderer::new(stdout(), size.1, size.0);
     let board = GridBoard::random(size.1.into(), size.0.into());

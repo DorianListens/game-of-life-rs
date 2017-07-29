@@ -3,25 +3,35 @@ use models::*;
 
 extern crate rand;
 use rand::*;
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct GridBoard {
     pub cells: Vec<Cell>,
     pub width: i32,
     pub height: i32,
+    cellmap: HashMap<Coordinates, Cell>,
 }
 
+fn vec_to_map(cells: &Vec<Cell>) -> HashMap<Coordinates, Cell> {
+    let mut h = HashMap::new();
+    for cell in cells {
+        h.insert(cell.location.clone(), cell.clone());
+    }
+    h
+}
 impl GridBoard {
     pub fn square(size: i32) -> GridBoard {
         GridBoard {
             width: size,
             height: size,
             cells: Vec::new(),
+            cellmap: HashMap::new(),
         }
     }
 
     pub fn with_cells(cells: Vec<Cell>) -> GridBoard {
-        GridBoard { width: 0, height: 0, cells }
+        GridBoard { width: 0, height: 0, cells: cells.clone(), cellmap: vec_to_map(&cells) }
     }
 
     pub fn all_alive(size: i32) -> GridBoard {
@@ -36,6 +46,16 @@ impl GridBoard {
         let mut rng = rand::thread_rng();
         GridBoard::fill_with(width, height, Box::new(move |_| {
             if rng.gen() {
+                CellState::Alive
+            } else {
+                CellState::Dead
+            }
+        }))
+    }
+
+    pub fn diagonal(width: i32, height: i32) -> GridBoard {
+        GridBoard::fill_with(width, height, Box::new(move |c| {
+            if c.x == c.y || c.x + 1 == c.y || c.x - 1 == c.y {
                 CellState::Alive
             } else {
                 CellState::Dead
@@ -61,17 +81,15 @@ impl GridBoard {
         GridBoard {
             width,
             height,
-            cells,
+            cells: cells.clone(),
+            cellmap: vec_to_map(&cells),
         }
     }
 }
 
 impl Board for GridBoard {
     fn at(&self, coordinates: Coordinates) -> Option<Cell> {
-        self.cells
-            .iter()
-            .find(|x| x.location == coordinates)
-            .cloned()
+        self.cellmap.get(&coordinates).cloned()
     }
 }
 

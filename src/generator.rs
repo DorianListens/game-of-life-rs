@@ -7,19 +7,16 @@ pub struct SquareGenerator {}
 
 impl Generator<GridBoard> for SquareGenerator {
     fn generate(&self, board: &GridBoard) -> GridBoard {
-        let neighbour_states = board.cells.par_iter().map(|x| x.location.neighbours()).map(
-            |x| {
-                x.iter()
-                    .filter_map(|x| board.at(x.clone()))
-                    .map(|x| x.cell_state)
-                    .collect::<Vec<_>>()
-            },
-        );
-
         let new_cells = board
             .cells
-            .par_iter()
-            .zip(neighbour_states)
+            .iter()
+            .map(|x| {
+                    (x, x.location.neighbours().iter()
+                        .filter_map(|n| board.at(*n))
+                        .map(|x| x.cell_state)
+                        .collect::<Vec<_>>())
+                }
+            )
             .map(|(cell, neighbours)| process(cell, neighbours))
             .collect();
 
