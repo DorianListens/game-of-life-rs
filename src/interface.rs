@@ -1,7 +1,7 @@
 pub use models::{Cell, Coordinates};
 
 pub trait Board: Clone {
-    fn at(&self, coordiates: Coordinates) -> Option<&Cell>;
+    fn at(&self, coordiates: Coordinates) -> Option<Cell>;
 }
 
 pub trait Renderer<T: Board> {

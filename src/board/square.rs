@@ -19,10 +19,7 @@ impl SquareBoard {
     }
 
     pub fn with_cells(cells: Vec<Cell>) -> SquareBoard {
-        SquareBoard {
-            size: 0,
-            cells,
-        }
+        SquareBoard { size: 0, cells }
     }
 
     pub fn all_alive(size: i32) -> SquareBoard {
@@ -74,8 +71,11 @@ impl SquareBoard {
 }
 
 impl Board for SquareBoard {
-    fn at(&self, coordinates: Coordinates) -> Option<&Cell> {
-        self.cells.iter().find(|x| x.location == coordinates)
+    fn at(&self, coordinates: Coordinates) -> Option<Cell> {
+        self.cells
+            .iter()
+            .find(|x| x.location == coordinates)
+            .cloned()
     }
 }
 
@@ -95,14 +95,14 @@ mod tests {
         let cell2 = board.at(Coordinates { x: x2, y: y2 });
         assert_eq!(
             cell,
-            Some(&Cell {
+            Some(Cell {
                 cell_state: CellState::Alive,
                 location: Coordinates { x, y },
             })
         );
         assert_eq!(
             cell2,
-            Some(&Cell {
+            Some(Cell {
                 cell_state: CellState::Alive,
                 location: Coordinates { x: x2, y: y2 },
             })

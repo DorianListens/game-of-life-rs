@@ -25,4 +25,3 @@ impl Generator<SquareBoard> for SquareGenerator {
         SquareBoard::with_cells(new_cells)
     }
 }
-

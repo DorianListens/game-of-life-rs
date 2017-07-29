@@ -29,7 +29,11 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
         }
     }
 
-    pub fn play(self, generations: u32, delay: time::Duration) -> T {
+    fn play(self, generations: u32) -> T {
+        self.play_with_delay(generations, time::Duration::from_millis(0))
+    }
+
+    pub fn play_with_delay(self, generations: u32, delay: time::Duration) -> T {
         self.renderer.render(&self.board);
 
         let mut b = self.board;
@@ -115,7 +119,7 @@ mod tests {
     }
 
     impl Board for FakeBoard {
-        fn at(&self, coordinates: Coordinates) -> Option<&Cell> {
+        fn at(&self, coordinates: Coordinates) -> Option<Cell> {
             None
         }
     }

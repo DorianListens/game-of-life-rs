@@ -8,10 +8,10 @@ use life::generator::*;
 use std::{thread, time};
 
 fn main() {
-    let renderer = ScreenRenderer::new(75);
-    let board = SquareBoard::random(75);
+    let renderer = ScreenRenderer::new(50);
+    let board = SquareBoard::random(50);
     let generator = SquareGenerator {};
 
     let game = life::Game::new(board, &renderer, &generator);
-    game.play(100, time::Duration::from_millis(50));
+    game.play_with_delay(100, time::Duration::from_millis(50));
 }
