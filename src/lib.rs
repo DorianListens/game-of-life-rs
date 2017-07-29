@@ -5,7 +5,9 @@
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 extern crate rand;
+extern crate rayon;
 extern crate termion;
+
 pub mod models;
 mod engine;
 pub mod interface;
@@ -30,7 +32,7 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
         }
     }
 
-    fn play(self, generations: u32) -> T {
+    pub fn play(self, generations: u32) -> T {
         self.play_with_delay(generations, time::Duration::from_millis(0))
     }
 

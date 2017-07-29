@@ -38,7 +38,7 @@ impl ScreenRenderer {
 }
 
 fn row_to_string(cells: Vec<Option<Cell>>) -> String {
-    let mut string = String::with_capacity(cells.len());
+    let mut string = String::with_capacity(cells.len() + 1);
     for c in cells.into_iter().map(cell_to_char) {
         string.push(c);
     }

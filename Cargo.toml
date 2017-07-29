@@ -6,6 +6,7 @@ authors = ["Dorian Scheidt <dorian.scheidt@gmail.com>"]
 [dependencies]
 rand = "0.3"
 termion = "1"
+rayon = "0.8.2"
 
 [[bin]]
 name = "game"
