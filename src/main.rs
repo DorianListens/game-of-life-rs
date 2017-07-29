@@ -17,6 +17,5 @@ fn main() {
     let generator = SquareGenerator {};
 
     let game = life::Game::new(board, &renderer, &generator);
-    game.play(100);
-    // game.play_with_delay(100, time::Duration::from_millis(50));
+    game.play_with_delay(1000, time::Duration::from_millis(50));
 }

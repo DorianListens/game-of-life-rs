@@ -9,7 +9,7 @@ impl Generator<GridBoard> for SquareGenerator {
     fn generate(&self, board: &GridBoard) -> GridBoard {
         let new_cells = board
             .cells
-            .iter()
+            .par_iter()
             .map(|x| {
                     (x, x.location.neighbours().iter()
                         .filter_map(|n| board.at(*n))
