@@ -2,26 +2,40 @@ use models::*;
 use interface::{Board, Renderer};
 use board::square::*;
 use termion::clear;
+use termion::cursor;
 use termion::raw::IntoRawMode;
 use std::io::{Write, Stdout, stdout};
+use std::cell::RefCell;
 
 pub struct ScreenRenderer {
-    stdout: Stdout,
+    stdout: Box<RefCell<Write>>,
     width: u16,
     height: u16,
 }
 
 impl<T: Board> Renderer<T> for ScreenRenderer {
     fn render(&self, board: &T) {
-        clear_screen();
-        let screen: String = self.rows(board).into_iter().map(row_to_string).collect();
-        print!("{}", screen);
+        let screen = self.rows(board).into_iter().map(row_to_string).collect::<Vec<_>>();
+        let mut writer = self.stdout.borrow_mut();
+        write!(&mut writer,
+               "{}{}{}",
+               clear::All,
+               cursor::Goto(1, 1),
+               cursor::Hide,
+               ).unwrap();
+
+        for row in screen {
+            write!(&mut writer, "{}", row); 
+        }
+
+        writer.flush().unwrap();
     }
 }
 
 impl ScreenRenderer {
     pub fn new(stdout: Stdout, width: u16, height: u16) -> ScreenRenderer {
-        ScreenRenderer { stdout, width, height }
+        let mut term = stdout.into_raw_mode().unwrap();
+        ScreenRenderer { stdout: Box::new(RefCell::new(term)), width, height }
     }
 
     fn rows<T: Board>(&self, board: &T) -> Vec<Vec<Option<Cell>>> {
@@ -38,11 +52,10 @@ impl ScreenRenderer {
 }
 
 fn row_to_string(cells: Vec<Option<Cell>>) -> String {
-    let mut string = String::with_capacity(cells.len() + 1);
+    let mut string = String::with_capacity(cells.len());
     for c in cells.into_iter().map(cell_to_char) {
         string.push(c);
     }
-    string.push('\n');
     string
 }
 
@@ -58,10 +71,6 @@ fn char_for_state(state: CellState) -> char {
         CellState::Alive => '0',
         CellState::Dead => ' ',
     }
-}
-
-fn clear_screen() {
-    print!("{}[2J", 27 as char);
 }
 
 #[cfg(test)]
