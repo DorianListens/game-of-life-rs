@@ -1,1 +1,1 @@
-pub mod square;
+pub mod grid;

@@ -113,17 +113,22 @@ mod tests {
     #[derive(Debug, PartialEq, Eq, Clone, Hash)]
     struct FakeBoard {
         seed: i32,
+        rows: Vec<Vec<Cell>>,
     }
 
     impl FakeBoard {
         fn new(seed: i32) -> FakeBoard {
-            FakeBoard { seed }
+            FakeBoard { seed, rows: vec![] }
         }
     }
 
     impl Board for FakeBoard {
         fn at(&self, coordinates: Coordinates) -> Option<Cell> {
             None
+        }
+
+        fn rows(&self) -> &Vec<Vec<Cell>> {
+            &self.rows
         }
     }
 

@@ -3,39 +3,33 @@ use models::*;
 
 extern crate rand;
 use rand::*;
-use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct GridBoard {
-    pub cells: Vec<Cell>,
-    pub width: i32,
-    pub height: i32,
-    cellmap: HashMap<Coordinates, Cell>,
+    height: i32,
+    width: i32,
+    pub rows: Vec<Vec<Cell>>,
 }
 
-fn vec_to_map(cells: &Vec<Cell>) -> HashMap<Coordinates, Cell> {
-    let mut h = HashMap::new();
-    for cell in cells {
-        h.insert(cell.location.clone(), cell.clone());
-    }
-    h
-}
 impl GridBoard {
     pub fn square(size: i32) -> GridBoard {
         GridBoard {
             width: size,
             height: size,
-            cells: Vec::new(),
-            cellmap: HashMap::new(),
+            rows: Vec::new(),
         }
     }
 
-    pub fn with_cells(cells: Vec<Cell>) -> GridBoard {
-        GridBoard { width: 0, height: 0, cells: cells.clone(), cellmap: vec_to_map(&cells) }
+    pub fn with_rows(rows: Vec<Vec<Cell>>) -> GridBoard {
+        GridBoard {
+            width: rows[0].len() as i32,
+            height: rows.len() as i32,
+            rows,
+        }
     }
 
     pub fn all_alive(size: i32) -> GridBoard {
-        GridBoard::fill_with(size, size, Box::new(|_| CellState::Alive ))
+        GridBoard::fill_with(size, size, Box::new(|_| CellState::Alive))
     }
 
     pub fn random_square(size: i32) -> GridBoard {
@@ -44,52 +38,72 @@ impl GridBoard {
 
     pub fn random(width: i32, height: i32) -> GridBoard {
         let mut rng = rand::thread_rng();
-        GridBoard::fill_with(width, height, Box::new(move |_| {
-            if rng.gen() {
+        GridBoard::fill_with(
+            width,
+            height,
+            Box::new(move |_| if rng.gen() {
                 CellState::Alive
             } else {
                 CellState::Dead
-            }
-        }))
+            }),
+        )
     }
 
     pub fn diagonal(width: i32, height: i32) -> GridBoard {
-        GridBoard::fill_with(width, height, Box::new(move |c| {
-            if c.x == c.y || c.x + 1 == c.y || c.x - 1 == c.y {
+        GridBoard::fill_with(
+            width,
+            height,
+            Box::new(move |c| if c.x == c.y || c.x + 1 == c.y || c.x - 1 == c.y {
                 CellState::Alive
             } else {
                 CellState::Dead
-            }
-        }))
+            }),
+        )
     }
 
-    fn fill_with(width: i32, height: i32, mut state_for_coords: Box<FnMut(Coordinates) -> CellState>) -> GridBoard {
-        let mut cells = Vec::new();
+    fn fill_with(
+        width: i32,
+        height: i32,
+        mut state_for_coords: Box<FnMut(Coordinates) -> CellState>,
+    ) -> GridBoard {
 
-        for x in 0..width {
-            for y in 0..height {
+        let mut rows = Vec::with_capacity(height as usize);
+        for y in 0..height {
+            let mut row = Vec::with_capacity(width as usize);
+            for x in 0..width {
                 let location = Coordinates { x, y };
                 let state = state_for_coords(location);
                 let cell = Cell {
                     cell_state: state,
                     location: location,
                 };
-                cells.push(cell);
+                row.push(cell);
             }
+            rows.push(row);
         }
 
         GridBoard {
             width,
             height,
-            cells: cells.clone(),
-            cellmap: vec_to_map(&cells),
+            rows,
         }
     }
 }
 
 impl Board for GridBoard {
     fn at(&self, coordinates: Coordinates) -> Option<Cell> {
-        self.cellmap.get(&coordinates).cloned()
+        if coordinates.x >= 0 && coordinates.y >= 0 {
+            if coordinates.y < self.height {
+                if coordinates.x < self.width {
+                    return Some(self.rows[coordinates.y as usize][coordinates.x as usize]);
+                }
+            }
+        }
+        None
+    }
+
+    fn rows(&self) -> &Vec<Vec<Cell>> {
+        &self.rows
     }
 }
 
