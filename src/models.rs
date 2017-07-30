@@ -62,6 +62,8 @@ pub struct Cell {
 pub enum CellState {
     Alive,
     Dead,
+    Born,
+    Died,
 }
 
 #[cfg(test)]

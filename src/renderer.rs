@@ -51,14 +51,18 @@ impl ScreenRenderer {
 struct StringTransformer {
     alive: String,
     dead: String,
+    born: String,
+    died: String,
     none: String,
 }
 
 impl StringTransformer {
     fn new() -> StringTransformer {
         StringTransformer {
-            alive: format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset)),
+            alive: String::from("0"),
             dead: String::from(" "),
+            born: format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset)),
+            died: format!("{}x{}", color::Fg(color::Red), color::Fg(color::Reset)),
             none: String::from("x"),
         }
     }
@@ -78,6 +82,8 @@ impl StringTransformer {
         match *state {
             CellState::Alive => &self.alive,
             CellState::Dead => &self.dead,
+            CellState::Born => &self.born,
+            CellState::Died => &self.died,
         }
     }
 }
@@ -89,19 +95,60 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_translates_cells_to_strings() {
+    fn born_cells_are_green() {
         let location = Coordinates { x: 0, y: 0 };
-        let cell1 = Cell {
+        let cell = Cell {
+            cell_state: Born,
+            location,
+        };
+        let cells = vec![Some(cell)];
+        let transformer = StringTransformer::new();
+        let output = transformer.row_to_string(&cells);
+        assert_eq!(
+            output,
+            format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset))
+        );
+    }
+
+    #[test]
+    fn living_cells_are_white() {
+        let location = Coordinates { x: 0, y: 0 };
+        let cell = Cell {
             cell_state: Alive,
             location,
         };
-        let cell2 = Cell {
+        let cells = vec![Some(cell)];
+        let transformer = StringTransformer::new();
+        let output = transformer.row_to_string(&cells);
+        assert_eq!(output, "0");
+    }
+
+    #[test]
+    fn dying_cells_are_red() {
+        let location = Coordinates { x: 0, y: 0 };
+        let cell = Cell {
+            cell_state: Died,
+            location,
+        };
+        let cells = vec![Some(cell)];
+        let transformer = StringTransformer::new();
+        let output = transformer.row_to_string(&cells);
+        assert_eq!(
+            output,
+            format!("{}x{}", color::Fg(color::Red), color::Fg(color::Reset))
+        );
+    }
+
+    #[test]
+    fn dead_cells_are_blank() {
+        let location = Coordinates { x: 0, y: 0 };
+        let cell = Cell {
             cell_state: Dead,
             location,
         };
-        let cells = vec![Some(cell1), Some(cell2), None];
+        let cells = vec![Some(cell)];
         let transformer = StringTransformer::new();
         let output = transformer.row_to_string(&cells);
-        assert_eq!(output, format!("{}0{} x", color::Fg(color::Green), color::Fg(color::Reset)));
+        assert_eq!(output, " ");
     }
 }

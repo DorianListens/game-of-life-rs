@@ -16,5 +16,5 @@ fn main() {
 
     let game = life::Game::new(board, &renderer, &generator);
     //game.play(1000);
-    game.play_with_delay(1000, time::Duration::from_millis(16));
+    game.play_with_delay(1000, time::Duration::from_millis(30));
 }

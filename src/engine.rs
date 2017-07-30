@@ -1,17 +1,30 @@
 use models::*;
+use models::CellState::*;
 
 pub fn process(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
     match cell.cell_state {
-        CellState::Dead => process_dead_cell(cell, neighbours),
-        CellState::Alive => process_living_cell(cell, neighbours),
+        Died | Dead => process_dead_cell(cell, neighbours),
+        Born | Alive => process_living_cell(cell, neighbours),
     }
 }
 
 fn process_dead_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
     let new_state = if count_of_living_neighbours(neighbours) == 3 {
-        CellState::Alive
+        Born
     } else {
-        CellState::Dead
+        Dead
+    };
+
+    Cell {
+        cell_state: new_state,
+        location: cell.location,
+    }
+}
+
+fn process_living_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
+    let new_state = match count_of_living_neighbours(neighbours) {
+        x if x < 2 || x > 3 => Died,
+        _ => Alive,
     };
 
     Cell {
@@ -23,20 +36,8 @@ fn process_dead_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
 fn count_of_living_neighbours(neighbours: Vec<CellState>) -> usize {
     neighbours
         .iter()
-        .filter(|&x| x == &CellState::Alive)
+        .filter(|&x| x == &Alive || x == &Born)
         .count()
-}
-
-fn process_living_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
-    let new_state = match count_of_living_neighbours(neighbours) {
-        x if x < 2 || x > 3 => CellState::Dead,
-        _ => CellState::Alive,
-    };
-
-    Cell {
-        cell_state: new_state,
-        location: cell.location,
-    }
 }
 
 #[cfg(test)]
@@ -45,75 +46,83 @@ mod tests {
     #[test]
     fn a_dead_cell_with_no_neighbours_stays_dead() {
         let cell = Cell {
-            cell_state: CellState::Dead,
+            cell_state: Dead,
             location: Coordinates { x: 0, y: 0 },
         };
         let neighbours = vec![];
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Dead);
     }
 
     #[test]
     fn a_dead_cell_with_dead_neighbours_stays_dead() {
-        use self::CellState::*;
         let cell = Cell {
-            cell_state: CellState::Dead,
+            cell_state: Dead,
             location: Coordinates { x: 0, y: 0 },
         };
         let neighbours = vec![Dead, Dead, Dead, Dead, Dead, Dead, Dead];
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Dead);
     }
 
     #[test]
     fn a_dead_cell_with_less_than_three_live_neighbours_stays_dead() {
-        use self::CellState::*;
         let cell = Cell {
-            cell_state: CellState::Dead,
+            cell_state: Dead,
             location: Coordinates { x: 0, y: 0 },
         };
         let neighbours = vec![Alive, Alive, Dead, Dead, Dead, Dead, Dead];
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Dead);
     }
 
     #[test]
     fn a_dead_cell_with_three_live_neighbours_comes_to_life() {
-        use self::CellState::*;
         let cell = Cell {
-            cell_state: CellState::Dead,
+            cell_state: Dead,
             location: Coordinates { x: 0, y: 0 },
         };
         let neighbours = vec![Alive, Alive, Alive, Dead, Dead, Dead, Dead];
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Alive);
+        assert_eq!(processed_cell.cell_state, Born);
+    }
+
+    #[test]
+    fn born_cells_count_as_living() {
+        let cell = Cell {
+            cell_state: Dead,
+            location: Coordinates { x: 0, y: 0 },
+        };
+        let neighbours = vec![Born, Born, Alive, Dead, Dead, Dead, Dead];
+
+        let processed_cell = process(&cell, neighbours);
+
+        assert_eq!(processed_cell.cell_state, Born);
     }
 
     #[test]
     fn a_dead_cell_with_more_than_three_live_neighbours_stays_dead() {
-        use self::CellState::*;
         let cell = Cell {
-            cell_state: CellState::Dead,
+            cell_state: Dead,
             location: Coordinates { x: 0, y: 0 },
         };
         let neighbours = vec![Alive, Alive, Alive, Alive, Alive, Dead, Dead];
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Dead);
     }
 
     #[test]
     fn a_live_cell_with_no_neighbours_dies() {
-        use self::CellState::*;
         let cell = Cell {
             cell_state: Alive,
             location: Coordinates { x: 0, y: 0 },
@@ -122,12 +131,11 @@ mod tests {
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Died);
     }
 
     #[test]
     fn a_live_cell_with_one_living_neighbour_dies() {
-        use self::CellState::*;
         let cell = Cell {
             cell_state: Alive,
             location: Coordinates { x: 0, y: 0 },
@@ -136,12 +144,11 @@ mod tests {
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Died);
     }
 
     #[test]
     fn a_live_cell_with_two_or_three_living_neighbours_stays_alive() {
-        use self::CellState::*;
         let cell = Cell {
             cell_state: Alive,
             location: Coordinates { x: 0, y: 0 },
@@ -158,7 +165,6 @@ mod tests {
 
     #[test]
     fn a_live_cell_with_more_than_three_living_neighbours_dies() {
-        use self::CellState::*;
         let cell = Cell {
             cell_state: Alive,
             location: Coordinates { x: 0, y: 0 },
@@ -167,7 +173,7 @@ mod tests {
 
         let processed_cell = process(&cell, neighbours);
 
-        assert_eq!(processed_cell.cell_state, CellState::Dead);
+        assert_eq!(processed_cell.cell_state, Died);
     }
 
 }
