@@ -17,7 +17,7 @@ impl<T: Board> Renderer<T> for ScreenRenderer {
         let screen = self.screen(board);
 
         let mut writer = self.stdout.borrow_mut();
-        write!(&mut writer, "{}{}", cursor::Goto(0, 0), cursor::Hide,).expect("Couldn't write");
+        write!(&mut writer, "{}{}", cursor::Goto(1, 1), cursor::Hide,).expect("Couldn't write");
 
         writer.flush().unwrap();
         for row in screen {
