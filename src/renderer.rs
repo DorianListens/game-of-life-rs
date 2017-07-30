@@ -1,9 +1,9 @@
 use models::*;
 use interface::{Board, Renderer};
-use board::square::*;
 use termion::clear;
 use termion::cursor;
 use termion::raw::IntoRawMode;
+use termion::color;
 use std::io::{Write, Stdout, stdout};
 use std::cell::RefCell;
 
@@ -34,7 +34,7 @@ impl<T: Board> Renderer<T> for ScreenRenderer {
 
 impl ScreenRenderer {
     pub fn new(stdout: Stdout, width: u16, height: u16) -> ScreenRenderer {
-        let mut term = stdout.into_raw_mode().unwrap();
+        let term = stdout.into_raw_mode().unwrap();
         ScreenRenderer { stdout: Box::new(RefCell::new(term)), width, height }
     }
 
@@ -53,23 +53,23 @@ impl ScreenRenderer {
 
 fn row_to_string(cells: Vec<Option<Cell>>) -> String {
     let mut string = String::with_capacity(cells.len());
-    for c in cells.into_iter().map(cell_to_char) {
-        string.push(c);
+    for c in cells.into_iter().map(cell_to_str) {
+        string.push_str(&c);
     }
     string
 }
 
-fn cell_to_char(cell: Option<Cell>) -> char {
+fn cell_to_str(cell: Option<Cell>) -> String {
     match cell {
-        None => 'x',
-        Some(cell) => char_for_state(cell.cell_state),
+        None => String::from("x"),
+        Some(cell) => state_to_str(cell.cell_state),
     }
 }
 
-fn char_for_state(state: CellState) -> char {
+fn state_to_str(state: CellState) -> String {
     match state {
-        CellState::Alive => '0',
-        CellState::Dead => ' ',
+        CellState::Alive => format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset)),
+        CellState::Dead => String::from(" "),
     }
 }
 
