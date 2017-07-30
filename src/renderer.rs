@@ -59,9 +59,9 @@ struct StringTransformer {
 impl StringTransformer {
     fn new() -> StringTransformer {
         StringTransformer {
-            alive: String::from("0"),
+            alive: String::from("o"),
             dead: String::from(" "),
-            born: format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset)),
+            born: format!("{}O{}", color::Fg(color::Green), color::Fg(color::Reset)),
             died: format!("{}x{}", color::Fg(color::Red), color::Fg(color::Reset)),
             none: String::from("x"),
         }
@@ -106,7 +106,7 @@ mod tests {
         let output = transformer.row_to_string(&cells);
         assert_eq!(
             output,
-            format!("{}0{}", color::Fg(color::Green), color::Fg(color::Reset))
+            format!("{}O{}", color::Fg(color::Green), color::Fg(color::Reset))
         );
     }
 
@@ -120,7 +120,7 @@ mod tests {
         let cells = vec![Some(cell)];
         let transformer = StringTransformer::new();
         let output = transformer.row_to_string(&cells);
-        assert_eq!(output, "0");
+        assert_eq!(output, "o");
     }
 
     #[test]
