@@ -102,6 +102,6 @@ mod tests {
         let cells = vec![Some(cell1), Some(cell2), None];
         let transformer = StringTransformer::new();
         let output = transformer.row_to_string(&cells);
-        assert_eq!(output, "0 x\n");
+        assert_eq!(output, format!("{}0{} x", color::Fg(color::Green), color::Fg(color::Reset)));
     }
 }

@@ -41,9 +41,9 @@ impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
 
         let mut b = self.board;
         for _ in 0..generations {
+            thread::sleep(delay);
             b = self.generator.generate(&b);
             self.renderer.render(&b);
-            thread::sleep(delay);
         }
 
         b
