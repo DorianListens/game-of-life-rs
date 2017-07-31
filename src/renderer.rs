@@ -2,35 +2,35 @@ use models::*;
 use interface::{Board, Renderer};
 use termion::cursor;
 use termion::color;
-use std::io::{stdout, Stdout, Write};
+use std::io::{Stdout, Write};
 use std::cell::RefCell;
 
-pub struct ScreenRenderer {
+pub struct StringRenderer {
     stdout: Box<RefCell<Write>>,
     width: u16,
     height: u16,
     transformer: StringTransformer,
 }
 
-impl<T: Board> Renderer<T> for ScreenRenderer {
+impl<T: Board> Renderer<T> for StringRenderer {
     fn render(&self, board: &T) {
-        let screen = self.screen(board);
+        let lines = self.lines(board);
 
         let mut writer = self.stdout.borrow_mut();
         write!(&mut writer, "{}{}", cursor::Goto(1, 1), cursor::Hide,).expect("Couldn't write");
 
         writer.flush().unwrap();
-        for row in screen {
-            write!(&mut writer, "{}", row);
+        for line in lines {
+            write!(&mut writer, "{}", line).expect("Couldn't write row");
         }
 
         writer.flush().unwrap();
     }
 }
 
-impl ScreenRenderer {
-    pub fn new(stdout: Stdout, width: u16, height: u16) -> ScreenRenderer {
-        ScreenRenderer {
+impl StringRenderer {
+    pub fn new(stdout: Stdout, width: u16, height: u16) -> StringRenderer {
+        StringRenderer {
             stdout: Box::new(RefCell::new(stdout)),
             width,
             height,
@@ -38,13 +38,14 @@ impl ScreenRenderer {
         }
     }
 
-    fn screen<T: Board>(&self, board: &T) -> Vec<String> {
+    fn lines<T: Board>(&self, board: &T) -> Vec<String> {
         board
             .rows()
             .into_iter()
-            .map(|row| row.into_iter().map(|x| Some(*x)).collect())
+            .take(self.height as usize)
+            .map(|row| row.into_iter().take(self.width as usize).map(|x| Some(*x)).collect())
             .map(|x| self.transformer.row_to_string(&x))
-            .collect::<Vec<_>>()
+            .collect()
     }
 }
 

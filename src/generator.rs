@@ -1,12 +1,11 @@
 use rayon::prelude::*;
-use board::grid::GridBoard;
-use interface::{Board, Generator};
-use engine::*;
 use models::{Cell, CellState};
+use interface::{Board, Generator};
+use engine::process;
 
-pub struct SquareGenerator {}
+pub struct SimpleGenerator {}
 
-impl<T: Board> Generator<T> for SquareGenerator {
+impl<T: Board> Generator<T> for SimpleGenerator {
     fn generate(&self, board: &T) -> T {
         let new_rows = board
             .rows()

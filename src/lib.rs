@@ -3,11 +3,12 @@ extern crate rayon;
 extern crate termion;
 
 pub mod models;
-mod engine;
 pub mod interface;
 pub mod board;
 pub mod generator;
 pub mod renderer;
+mod engine;
+
 use interface::{Board, Generator, Renderer};
 use std::{thread, time};
 
@@ -117,6 +118,7 @@ mod tests {
     }
 
     impl Board for FakeBoard {
+        #[allow(unused_variables)]
         fn at(&self, coordinates: Coordinates) -> Option<Cell> {
             None
         }
