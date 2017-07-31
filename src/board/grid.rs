@@ -1,4 +1,4 @@
-use interface::Board;
+use interface::{Board, Rows};
 use models::*;
 
 extern crate rand;
@@ -8,7 +8,7 @@ use rand::*;
 pub struct GridBoard {
     height: i32,
     width: i32,
-    pub rows: Vec<Vec<Cell>>,
+    pub rows: Rows,
 }
 
 impl GridBoard {
@@ -20,7 +20,7 @@ impl GridBoard {
         }
     }
 
-    pub fn with_rows(rows: Vec<Vec<Cell>>) -> GridBoard {
+    pub fn with_rows(rows: Rows) -> GridBoard {
         GridBoard {
             width: rows[0].len() as i32,
             height: rows.len() as i32,
@@ -104,6 +104,12 @@ impl Board for GridBoard {
 
     fn rows(&self) -> &Vec<Vec<Cell>> {
         &self.rows
+    }
+}
+
+impl From<Rows> for GridBoard {
+    fn from(rows: Rows) -> GridBoard {
+        GridBoard::with_rows(rows)
     }
 }
 

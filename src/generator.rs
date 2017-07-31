@@ -6,25 +6,25 @@ use models::{Cell, CellState};
 
 pub struct SquareGenerator {}
 
-impl Generator<GridBoard> for SquareGenerator {
-    fn generate(&self, board: &GridBoard) -> GridBoard {
+impl<T: Board> Generator<T> for SquareGenerator {
+    fn generate(&self, board: &T) -> T {
         let new_rows = board
             .rows()
             .par_iter()
             .map(|row| next_row(board, row))
             .collect();
 
-        GridBoard::with_rows(new_rows)
+        T::from(new_rows)
     }
 }
 
-fn next_row(board: &GridBoard, row: &Vec<Cell>) -> Vec<Cell> {
+fn next_row<T: Board>(board: &T, row: &Vec<Cell>) -> Vec<Cell> {
     row.par_iter()
         .map(|cell| process(&cell, neighbour_states(board, &cell)))
         .collect()
 }
 
-fn neighbour_states(board: &GridBoard, cell: &Cell) -> Vec<CellState> {
+fn neighbour_states<T: Board>(board: &T, cell: &Cell) -> Vec<CellState> {
     cell.location
         .neighbours()
         .into_iter()

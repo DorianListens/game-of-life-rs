@@ -126,6 +126,12 @@ mod tests {
         }
     }
 
+    impl From<Rows> for FakeBoard {
+        fn from(rows: Rows) -> FakeBoard {
+            FakeBoard { seed: 0, rows }
+        }
+    }
+
     struct FakeGenerator<T: Board> {
         boards: RefCell<Vec<T>>,
     }
