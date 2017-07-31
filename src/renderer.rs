@@ -1,9 +1,9 @@
-use models::*;
-use interface::{Board, Renderer};
-use termion::cursor;
-use termion::color;
 use std::io::{Stdout, Write};
 use std::cell::RefCell;
+use termion::{cursor, color};
+
+use models::*;
+use interface::{Board, Renderer};
 
 pub struct StringRenderer {
     stdout: Box<RefCell<Write>>,

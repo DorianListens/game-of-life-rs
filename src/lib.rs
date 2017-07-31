@@ -133,7 +133,7 @@ mod tests {
             None
         }
 
-        fn rows(&self) -> &Vec<Vec<Cell>> {
+        fn rows(&self) -> &Rows {
             &self.rows
         }
     }

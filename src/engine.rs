@@ -2,34 +2,29 @@ use models::*;
 use models::CellState::*;
 
 pub fn process(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
-    match cell.cell_state {
-        Died | Dead => process_dead_cell(cell, neighbours),
-        Born | Alive => process_living_cell(cell, neighbours),
+    let cell_state = match cell.cell_state {
+        Died | Dead => process_dead_cell(neighbours),
+        Born | Alive => process_living_cell(neighbours),
+    };
+
+    Cell {
+        cell_state,
+        location: cell.location,
     }
 }
 
-fn process_dead_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
-    let new_state = if count_of_living_neighbours(neighbours) == 3 {
+fn process_dead_cell(neighbours: Vec<CellState>) -> CellState {
+    if count_of_living_neighbours(neighbours) == 3 {
         Born
     } else {
         Dead
-    };
-
-    Cell {
-        cell_state: new_state,
-        location: cell.location,
     }
 }
 
-fn process_living_cell(cell: &Cell, neighbours: Vec<CellState>) -> Cell {
-    let new_state = match count_of_living_neighbours(neighbours) {
+fn process_living_cell(neighbours: Vec<CellState>) -> CellState {
+    match count_of_living_neighbours(neighbours) {
         x if x < 2 || x > 3 => Died,
         _ => Alive,
-    };
-
-    Cell {
-        cell_state: new_state,
-        location: cell.location,
     }
 }
 
