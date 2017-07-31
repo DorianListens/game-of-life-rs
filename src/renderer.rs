@@ -43,7 +43,12 @@ impl StringRenderer {
             .rows()
             .into_iter()
             .take(self.height as usize)
-            .map(|row| row.into_iter().take(self.width as usize).map(|x| Some(*x)).collect())
+            .map(|row| {
+                row.into_iter()
+                    .take(self.width as usize)
+                    .map(|x| Some(*x))
+                    .collect()
+            })
             .map(|x| self.transformer.row_to_string(&x))
             .collect()
     }

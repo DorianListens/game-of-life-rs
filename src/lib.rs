@@ -12,13 +12,23 @@ mod engine;
 use interface::{Board, Generator, Renderer};
 use std::{thread, time};
 
-pub struct Game<'a, T: Board, U: 'a + Renderer<T>, V: 'a + Generator<T>> {
+pub struct Game<'a, T, U, V>
+where
+    T: Board,
+    U: 'a + Renderer<T>,
+    V: 'a + Generator<T>,
+{
     board: T,
     renderer: &'a U,
     generator: &'a V,
 }
 
-impl<'a, T: Board, U: Renderer<T>, V: Generator<T>> Game<'a, T, U, V> {
+impl<'a, T, U, V> Game<'a, T, U, V>
+where
+    T: Board,
+    U: 'a + Renderer<T>,
+    V: 'a + Generator<T>,
+{
     pub fn new(board: T, renderer: &'a U, generator: &'a V) -> Game<'a, T, U, V> {
         Game {
             board,
